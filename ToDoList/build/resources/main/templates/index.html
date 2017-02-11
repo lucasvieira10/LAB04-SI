@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html ng-app="toDoList">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Agenda de Tarefas</title>
+    <script src='js/pdfmake.min.js'></script>
+    <script src='js/vfs_fonts.js'></script>
+
+    <!-- Bootstrap -->
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css"/>
+
+  </head>
+  
+  <body>
+    <div ng-controller="toDoListController" id="interface">
+
+    <!-- Barra de menu do bootstrap -->
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">Agenda de Tarefas</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="index.html">Principal</a></li>
+
+            <li class="dropdown"><a href="#" target="_blank" 
+            	class="dropdown-toggle" data-toggle="dropdown">
+            	
+            	Tarefas <b class="caret"></b></a>
+
+            	<!-- Sub menu para as tarefas -->
+            	<ul class="dropdown-menu">
+                  <li><a href="#openModalVerDetalhes" ng-click="calcularTotalDeTarefasACumprir()">Ver detalhes</a></li>
+                </ul>
+            </li>
+
+            <li class="dropdown"><a href="#" target="_blank" 
+              class="dropdown-toggle" data-toggle="dropdown">
+              
+              Agendas <b class="caret"></b></a>
+
+              <ul class="dropdown-menu">
+                 
+                  <li id="criar_agenda"><a href="#openModalCriarAgenda">Criar nova agenda</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" ng-click="excluirAgendas()">Excluir agendas</a></li>
+                </ul>
+            </li>
+
+            <li ng-show="agendaFoiSelecionada"><a href="#openModalFiltrarPrioridade">Filtrar</a></li>
+
+            <li><a href="https://github.com/lucasvieira10" target="_blank">Sobre</a></li>
+
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <!--<li><a><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>-->
+            <li><a><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+          </ul>
+        </div>
+      </nav>
+
+
+
+      <!--Caso nao tenha nenhuma agenda selecionada -->
+
+      <section ng-show="!agendaFoiSelecionada" id="conteudo_principal">
+        <h1>Seja Bem-Vindo!</h1>
+
+        <img id="img_welcome" src="pictures/tarefas.jpg"/><br/>
+
+        <p id="please" ng-show="agendas.length > 0">Por favor, selecione uma agenda!</p>
+
+        <ul class="pagination">
+          <li><a href="#">«</a></li>
+          <li ng-repeat="agenda in agendas" ng-click="carregarDadosDaAgendaAtual(agenda); select(agenda)">
+            <a ng-attr-title="{{agenda.nome}}" ng-class="{active: isActive(agenda)}" href="">
+              {{agendas.indexOf(agenda) + 1}}
+            </a>
+          </li>
+          <li><a href="#">»</a></li>
+        </ul>
+      </section>
+
+
+
+      <!--Caso tenha alguma agenda selecionada -->
+
+      <section ng-show="agendaFoiSelecionada" id="conteudo_principal">
+      <h1>{{agendaAtual.nome}}</h1>
+
+      <!-- Entrada para o nome da tarefa -->
+      <div id="input_tarefa" class="form-group">
+        <form name="tarefaForm">
+          
+          <div>
+            <input type="text" ng-model="tarefa.nome" class="form-control" id="tarefa" placeholder="Escreva uma tarefa..." 
+              ng-minlength="10" maxlength="70" ng-required="true" name="tarefa"/>
+          </div>
+
+          <div>
+            <select ng-model="tarefa.prioridade" ng-options="prioridade for prioridade in prioridades" ng-required="true"
+              name="prioridade" class="form-control">
+              <option value="">Selecione uma prioridade</option>
+            </select>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- Avisos | Validacao-->
+      <div id="alert" ng-show="tarefaForm.tarefa.$error.required" class="alert alert-info alert-dismissable">
+          <strong>Aviso!</strong> Por favor, escreva uma tarefa.
+      </div>
+
+      <div id="alert" ng-show="tarefaForm.tarefa.$error.minlength" class="alert alert-info alert-dismissable">
+          <strong>Aviso!</strong> O campo tarefa deve ter no mínimo 10 caracteres.
+      </div>
+
+      <div id="alert" ng-show="tarefaForm.tarefa.$valid" class="alert alert-info alert-dismissable">
+          <strong>Aviso!</strong> Por favor, selecione uma prioridade.
+      </div>
+
+      <!-- Botao para adicionar uma nova tarefa -->
+      <button id="button_addTarefa" type="button" class="btn btn-success" ng-click="salvarTarefa(tarefa)"
+        ng-disabled="tarefaForm.$invalid">
+        <span class="glyphicon glyphicon-plus"> Adicionar</span>
+      </button>
+      
+      <!-- Botao para limpar toda a lista de tarefas -->
+      <button id="button_cleanTarefas" type="button" class="btn btn-danger" ng-click="limparTarefas()"
+        ng-disabled="!estaVazia(tarefas)">
+        <span class="glyphicon glyphicon-trash"> Limpar</span>
+      </button>
+
+      <div id="valores_totais">
+        <h2>Detalhes</h2>
+
+        <li class="list-group-item">
+          Total de tarefas para cumprir: <span>{{agendaAtual.tarefasParaCumprir}}</span>
+        </li>
+        <li class="list-group-item">
+          Total de tarefas concluidas: <span>{{agendaAtual.tarefasJaConcluidas}}</span>
+        </li>
+
+        <!-- Barra de Progresso -->
+        <div id="progressbar">
+          <div ng-style="{ 'width': porcentagemDasTarefasConcluidas() + '%' }">
+            <span ng-show="porcentagemDasTarefasConcluidas() > 0">{{porcentagemDasTarefasConcluidas() + '%'}}</span>
+          </div>
+        </div>
+      </div>
+
+        <!--<button ng-click="removerAgenda()" id="btn_delete" type="button" class="form-control">-->
+          <!--<span> Excluir agenda</span>-->
+        <!--</button>-->
+
+        <div id="exluir_salvar_agenda">
+          <a href="#" ng-click="removerAgenda()" id="btn_delete" class="btn btn-default">
+            <span class="glyphicon glyphicon-trash"></span> Excluir Agenda</a>
+
+          <a href="#" ng-click="exportarAgenda()" class="btn btn-default"><span class="glyphicon glyphicon-floppy-save">
+          </span> Exportar agenda</a>
+        </div>
+
+      <!-- Div onde estara listada todas as minhas tarefas -->
+      <div id="resultado">
+        <h2>Tarefas</h2>
+
+        <div ng-show="tarefas.length > 0" class="form-group">
+          <select ng-model="orderType" class="form-control" id="order_type">
+            <option value="">Selecione um tipo de ordenação</option>
+            <option value="prioridade">Prioridade</option>
+            <option value="nome">Nome</option>
+          </select>
+        </div>
+
+        <div id="list_tarefa">
+
+            <li class="list-group-item" ng-repeat="tarefa in tarefas | orderBy: orderType" >
+
+              <div class="checkbox">
+                <label ng-class="{selecionada: tarefa.selecionada}">
+                  <input type="checkbox" ng-model="tarefa.selecionada"
+                         ng-click="atualizarStatusDasTarefas(); atualizarTarefaAtual(tarefa)"/>
+
+                  <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                  
+                  <a href="#openModalAlterarTarefa" ng-click="atualizarTarefaAtual(tarefa)">
+                    <span id="nomeTarefa">{{tarefa.nome}}</span>
+                  </a>
+
+                  <div>
+                    <span id="prioridadeTarefa" ng-style="{'color': corDasPrioridades[tarefa.prioridade - 1]}">
+                      {{'Prioridade: ' + tarefa.prioridade}}</span>
+                  </div>
+
+                </label>
+        
+                <button ng-click="removerTarefa(tarefa)" type="button" class="btn btn-danger" id="removerButton">
+                  <span class="glyphicon glyphicon-trash"></span>
+                </button> 
+
+              </div>
+            </li>
+        </div>
+
+
+        <ul class="pagination">
+          <li><a href="#">«</a></li>
+          <li ng-repeat="agenda in agendas" ng-click="carregarDadosDaAgendaAtual(agenda); select(agenda)">
+            <a ng-attr-title="{{agenda.nome}}" ng-class="{active: isActive(agenda)}" href="">
+              {{agendas.indexOf(agenda) + 1}}
+            </a>
+          </li>
+          <li><a href="#">»</a></li>
+        </ul>
+      </div>
+    </section>
+
+      <!-- Modal para criar a Agenda -->
+      <div id="openModalCriarAgenda" class="modalDialog">
+        <div>
+          <a href="#close" title="Close" class="close">X</a>
+          <div id="modal_criar_agenda"><span>Criar Agenda</span></div>
+          <input ng-model="agenda.nome" type="text" class="form-control" placeholder="Escreva um nome..."/>
+
+          <a href="#close">
+            <button ng-click="salvarAgenda(agenda.nome)" type="button" class="btn btn-success" id="btn_salvarAgenda">
+              <span class="glyphicon glyphicon-ok"> Salvar&nbsp;</span>
+            </button>
+          </a>
+
+          <a href="#close">
+            <button type="button" class="btn btn-danger">
+              <span class="glyphicon glyphicon-remove"> Cancelar</span>
+            </button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Modal para atualizar tarefa -->
+      <div id="openModalAlterarTarefa" class="modalDialog">
+        <div>
+          <a href="#close" title="Close" class="close">X</a>
+          <div id="modal_alterar_tarefa"><span>Alterar Tarefa</span></div>
+          <input ng-model="tarefaAtual.nome" type="text" class="form-control" placeholder="Alterar o nome da tarefa..."/>
+
+          <textarea ng-model="tarefaAtual.comentario" name="comment" placeholder="Escreva um comentário..."
+                    class="form-control"></textarea>
+
+          <select ng-model="tarefaAtual.prioridade" ng-options="prioridade for prioridade in prioridades" ng-required="true"
+                  name="prioridade" class="form-control">
+            <option value="">Selecione uma prioridade</option>
+          </select>
+
+          <div class="strike">
+            <span style="font-size: 17px">Categoria da Tarefa</span>
+          </div>
+
+          <input ng-model="tarefaAtual.categoria" type="text" class="form-control" placeholder="Escreva a categoria..."/>
+
+          <a href="#openModalSubTarefa"><button id="ir_subtarefa" class="form-control">Subtarefas</button></a>
+
+          <a href="#close">
+            <button ng-click="atualizarTarefa()" type="button" class="btn btn-success" id="btn_alterarTarefa">
+              <span class="glyphicon glyphicon-ok"> Salvar&nbsp;</span>
+            </button>
+          </a>
+
+          <a href="#close">
+            <button type="button" class="btn btn-danger">
+              <span class="glyphicon glyphicon-remove"> Cancelar</span>
+            </button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Modal para ver os detalhes das tarefas -->
+      <div id="openModalVerDetalhes" class="modalDialog">
+        <div>
+          <a href="#close" title="Close" class="close">X</a>
+          <div id="modal_ver_detalhes"><span>Ver Detalhes</span></div>
+
+          <p>Total de tarefas para cumprir: {{tarefasParaCumprirEmTodasAgendas}}</p>
+        </div>
+      </div>
+
+      <!-- Modal para filtar por prioridade-->
+      <div id="openModalFiltrarPrioridade" class="modalDialog">
+        <div class="modal-body">
+          <!--<a href="#close" title="Close" class="close">X</a>-->
+          <div id="modal_filtar_prioridade"><span>Filtro por Prioridade</span></div>
+
+          <div class="form-group">
+            <select ng-model="filterType" class="form-control" id="filter_types">
+              <option value="">Selecione um filtro</option>
+              <option value="prioridade">Prioridade</option>
+              <option value="categoria">Categoria</option>
+            </select>
+          </div>
+
+          <input ng-show="filterType === 'prioridade'" ng-model="busca.prioridade" type="number"
+                 min="1" max="4" class="form-control" placeholder="Digite a prioridade..."/>
+
+          <input ng-show="filterType === 'categoria'" ng-model="busca.categoria" type="text"
+                 class="form-control" placeholder="Digite uma categoria..."/>
+
+          <div class="strike">
+            <span style="font-size: 17px">Relatório</span>
+          </div>
+
+            <div class="relatorio" ng-show="filterType === 'prioridade'">
+                <div>
+                    {{"Total de tarefas: " + quantidadeDeTarefasDeUmaPrioridade(busca.prioridade)}}
+                </div>
+                <div>
+                    {{"Tarefas já concluidas: " + quantidadeDeTarefasFeitasDeUmaPrioridade(busca.prioridade)}}
+                </div>
+            </div>
+
+            <div class="relatorio" ng-show="filterType === 'categoria'">
+                <div>
+                    {{"Total de tarefas: " + quantidadeDeTarefasDeUmaCategoria(busca.categoria)}}
+                </div>
+                <div>
+                    {{"Tarefas já concluidas: " + quantidadeDeTarefasFeitasDeUmaCategoria(busca.categoria)}}
+                </div>
+            </div>
+
+          <li ng-show="filterType === 'prioridade'" class="list-group-item" ng-repeat="tarefa in tarefas |
+              filter: {prioridade: busca.prioridade} |
+              orderBy: 'prioridade'" ng-if="!tarefa.selecionada">
+
+            <span id="nomeTarefa">{{tarefa.nome}}</span>
+
+            <div>
+                <span id="prioridadeTarefa" ng-style="{'color': corDasPrioridades[tarefa.prioridade - 1]}">
+                {{'Prioridade: ' + tarefa.prioridade}}</span>
+            </div>
+          </li>
+
+          <li ng-show="filterType === 'categoria'" class="list-group-item" ng-repeat="tarefa in tarefas |
+              filter: {categoria: busca.categoria} |
+              orderBy: 'prioridade'" ng-if="!tarefa.selecionada">
+
+            <span id="nomeTarefa">{{tarefa.nome}}</span>
+
+            <div>
+                <span id="prioridadeTarefa" ng-style="{'color': corDasPrioridades[tarefa.prioridade - 1]}">
+                {{'Prioridade: ' + tarefa.prioridade}}</span>
+            </div>
+          </li>
+
+          <a href="#close">
+            <button type="button" class="btn btn-danger">
+              <span class="glyphicon glyphicon-remove"> Fechar</span>
+            </button>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Modal para as sub - tarefas -->
+      <div id="openModalSubTarefa" class="modalDialog">
+        <div class="modal-body">
+          <div id="modal_subtarefa"><span>{{tarefaAtual.nome}}</span></div>
+
+          <div>
+            <input type="text" ng-model="subtarefa.nome" class="form-control" id="subtarefa"
+                   placeholder="Escreva uma subtarefa..." name="subtarefa"/>
+          </div>
+
+          <div id="button_save_close">
+          <button ng-click="salvarSubtarefa(subtarefa)" type="button" class="btn btn-success" id="save_subtarefa">
+            <span class="glyphicon glyphicon-ok"> Salvar&nbsp;</span>
+          </button>
+
+          <a href="#close">
+            <button id="fechar_subtarefas" type="button" class="btn btn-danger">
+              <span class="glyphicon glyphicon-remove"> Fechar</span>
+            </button>
+          </a>
+          </div>
+
+          <div id="list_tarefa">
+
+            <li class="list-group-item" ng-repeat="subtarefa in tarefaAtual.subtarefas" >
+
+              <!--{{subtarefa}}-->
+
+              <div class="checkbox">
+                <label ng-class="{selecionada: subtarefa.selecionada}">
+                  <input type="checkbox" ng-model="subtarefa.selecionada"
+                    ng-click="atualizarSubtarefa(subtarefa)"/>
+
+                  <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+
+                  <span id="nomeTarefa">{{subtarefa.nome}}</span>
+                </label>
+
+                <button ng-click="removerSubtarefa(subtarefa.id)" style="margin-top: -4px" type="button" class="btn btn-danger" >
+                  <span class="glyphicon glyphicon-trash"></span>
+                </button>
+
+              </div>
+            </li>
+          </div>
+
+        </div>
+      </div>
+
+    <!-- Rodape da pagina -->
+    <footer id="rodape">
+      <p>Copyright &copy; 2016 - by Lucas Vieira
+      <br/> <a href="https://github.com/lucasvieira10" target="_blank">GitHub</a></p>
+    </footer>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+
+    <!--<script src="lib/angular/angular.min.js"></script>-->
+    <script src="js/controllers/toDoController.js"></script>
+    <script src="js/services/agendaAPIService.js"></script>
+    <script src="js/services/tarefaAPIService.js"></script>
+    <script src="js/services/subtarefaAPIService.js"></script>
+
+    <script src="js/format/formatarAgenda.js"></script>
+
+    <script src="js/models/agenda.js"></script>
+    <script src="js/models/tarefa.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,523 @@
+@charset "utf-8";
+
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+
+body {
+	font-family: 'Titillium Web', sans-serif;
+	background-color: #D5D5D5;
+	text-align: center;
+	background-image: url("../pictures/fundo.jpg");
+}
+
+body h1 {
+	color: #215FDC;
+}
+
+nav {
+	margin: -8px auto 0px auto;
+}
+
+div#interface {
+	width: 850px;
+	height: auto;
+	background-color: white;
+	margin: -20px auto 0px auto;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	padding: 30px;
+}
+
+section img {
+	height: 428px;
+	margin-bottom: -77px;
+}
+
+#progressbar {
+  	background-color: #161616;
+	border-radius: 13px; 
+	padding: 2px;
+	margin-top: 17px;
+}
+
+#progressbar > div {	
+    background-color: #215FDC;
+   	width: 0%; /* Adjust with Angular */
+   	height: 20px;
+   	border-radius: 10px;
+}
+
+#progressbar span {
+	color: white;
+}
+
+div#interface h1 {
+	padding-top: 10px;
+	padding-bottom: 15px;
+}
+
+#img_welcome {
+	height: 406px;
+	margin-top: -2px;
+}
+
+#please {
+	margin-top: 52px;
+	margin-bottom: -60px;
+	color: green;
+	font-size: 110%;
+}
+
+div#exluir_salvar_agenda {
+    margin-top: 10px;
+}
+
+div#input_tarefa div input {
+	height: 35px;
+	width: 100%;
+	font-size: 118%;
+	margin-right: 390px;
+}
+
+div#input_tarefa div select {
+	height: 35px;
+	background-color: white;
+	border-radius: 6px;
+}
+
+div#input_tarefa div {
+	display: inline-block;
+}
+
+div#alert {
+	padding: 2px;
+	margin-top: -10px;
+	margin-bottom: 10px;
+}
+
+div#alert a {
+	margin-right: 25px;
+}
+
+div#valores_totais {
+	padding-top: 8px;
+}
+
+div#valores_totais li {
+	font-size: 130%;
+}
+
+div#resultado h2 {
+	padding-top: 9px;
+}
+
+div#resultado input#input_filtro {
+	height: 35px;
+	font-size: 118%;
+	margin-bottom: 10px;
+}
+
+#order_type {
+	height: 35px;
+	background-color: white;
+	border-radius: 6px;
+	color: #282828;
+}
+
+div#list_tarefa {
+	text-align: left;
+	font-size: 130%;
+}
+
+div#list_tarefa span {
+	margin-left: 10px;
+	font-weight: 100;
+	margin-right: 10px;
+}
+
+div#list_tarefa button {
+	padding: 4px 1px 4px 1px;
+	float: right;
+	border-radius: 20px;
+}
+
+div#list_tarefa a {
+	color: black;
+}
+
+#prioridadeTarefa {
+	font-size: 75%;
+}
+
+button#button_cleanTarefas {
+	border-radius: 20px;
+	width: 15%;
+}
+
+button#button_addTarefa {
+	border-radius: 20px;
+	width: 15%;
+}
+ 
+/*button#btn_save {*/
+	/*border-radius: 20px;*/
+	/*width: 15%;*/
+	/*margin-top: 45px;*/
+	/*margin-bottom: -80px;*/
+/*}*/
+
+button#btn_delete {
+	padding: 0px!important;
+	border-radius: 30px;
+	width: 100%;
+	margin-top: 6px;
+	background-color: white;
+	border-color:  black;
+	color: black;
+}
+
+button#btn_delete:hover {
+	background-color: #f2f2f2;
+}
+
+footer#rodape {
+	margin-top: 101px;
+	clear: both;
+	border-top: 1px solid #606060;
+}
+
+footer#rodape a {
+	color: #215FDC;
+	text-decoration: none;
+}
+
+/*
+checkbox da tarefa
+*/
+
+.checkbox {
+    margin-left: -30px;
+}
+
+.checkbox label:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.checkbox .cr {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    border-radius: 20px;
+    width: 1.3em;
+    height: 1.4em;
+    float: left;
+    margin-right: .5em;
+}
+
+.checkbox .cr .cr-icon {
+    position: absolute;
+    font-size: .8em;
+    line-height: 0;
+    top: 50%;
+    left: 20%;
+}
+
+.checkbox label input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox label input[type="checkbox"] + .cr > .cr-icon {
+    transform: scale(3) rotateZ(-20deg);
+    opacity: 0;
+    transition: all .3s ease-in;
+}
+
+.checkbox label input[type="checkbox"]:checked + .cr > .cr-icon {
+    transform: scale(1) rotateZ(0deg);
+    opacity: 1;
+}
+
+.checkbox label input[type="checkbox"]:disabled + .cr{
+    opacity: .5;
+}
+
+/*
+modal para criar agenda
+*/
+
+#modal_criar_agenda {
+	background-color: #161616;
+	color: white;
+	font-size: 200%;
+	border-radius: 5px;
+	padding-bottom: 0px;
+	margin-top: -20px;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-bottom: 1px;
+	padding: 1px;
+}
+
+/* model para alterar tarefa */
+
+#modal_alterar_tarefa {
+	background-color: #161616;
+	color: white;
+	font-size: 200%;
+	border-radius: 5px;
+	padding-bottom: 0px;
+	margin-top: -20px;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-bottom: 1px;
+	padding: 1px;
+}
+
+#modal_ver_detalhes {
+	background-color: #161616;
+	color: white;
+	font-size: 200%;
+	border-radius: 5px;
+	padding-bottom: 0px;
+	margin-top: -20px;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-bottom: 1px;
+	padding: 1px;
+}
+
+#modal_filtar_prioridade {
+	background-color: #161616;
+	color: white;
+	font-size: 200%;
+	border-radius: 5px;
+	padding-bottom: 0px;
+	margin-top: -20px;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-bottom: 1px;
+	padding: 1px;
+}
+
+#openModalFiltrarPrioridade input {
+	margin-bottom: 10px;
+}
+
+.relatorio {
+	margin-top: 10px;
+	margin-bottom: 15px;
+	font-size: 120%;
+}
+
+#filter_types {
+	width: 108%;
+	margin-left: -15px;
+	margin-top: 15px;
+}
+
+#openModalFiltrarPrioridade li {
+	width: 107%;
+	margin-left: -13px;
+	text-align: left;
+	font-size: 120%;
+}
+
+#openModalVerDetalhes p {
+	margin-top: 15px;
+	font-size: 130%;
+}
+
+#openModalAlterarTarefa textarea {
+	height: 100px;
+	width: 392px;
+	margin-left: -13px;
+	margin-top: 10px;
+	resize: none;
+}
+
+#openModalAlterarTarefa select {
+	margin-top: 10px;
+	height: 35px;
+	width: 107%;
+	margin-left: -13px;
+	background-color: white;
+	border-radius: 6px;
+}
+
+#ir_subtarefa {
+	margin-left: -13px;
+	width: 107%;
+	background-color: #e4e4e4;
+}
+
+#modal_subtarefa {
+	background-color: #161616;
+	color: white;
+	font-size: 200%;
+	border-radius: 5px;
+	padding-bottom: 0px;
+	margin-top: -20px;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-bottom: 1px;
+	padding: 1px;
+}
+
+#openModalSubTarefa div#list_tarefa {
+	width: 107%;
+	margin-left: -13px;
+	margin-top: 10px;
+}
+
+#button_save_close {
+	display: inline;
+}
+
+#button_save_close button#fechar_subtarefas {
+	width: 30%;
+}
+
+.modalDialog input {
+	margin-top: 10px; 
+	width: 108%;
+	margin-left: -15px;	
+}
+
+.modalDialog button {
+	margin-top: 15px;
+	border-radius: 20px;
+}
+
+.modal-body {
+	max-height: calc(100vh - 210px);
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.modalDialog a {
+	color: white;
+}
+
+.modalDialog {
+	position: fixed;
+	font-family: Arial, Helvetica, sans-serif;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0,0,0,0.8);
+	z-index: 99999;
+	opacity:0;
+	-webkit-transition: opacity 400ms ease-in;
+	-moz-transition: opacity 400ms ease-in;
+	transition: opacity 400ms ease-in;
+	pointer-events: none;
+}
+
+.modalDialog:target {
+	opacity:1;
+	pointer-events: auto;
+}
+
+.modalDialog > div {
+	width: 400px;
+	position: relative;
+	margin: 10% auto;
+	padding: 22px 17px 5px 17px;
+	border-radius: 5px;
+	background: white;
+}
+
+.close {
+	background: #606061;
+	color: #FFFFFF;
+	line-height: 25px;
+	position: absolute;
+	right: -12px;
+	text-align: center;
+	top: -10px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	-moz-box-shadow: 1px 1px 3px #000;
+	-webkit-box-shadow: 1px 1px 3px #000;
+	box-shadow: 1px 1px 3px #000;
+}
+
+.close:hover {
+	background: #bf201c;
+	color: white;
+}
+
+/* Paginacao */
+
+ul.pagination {
+	display: inline-block;
+	padding: 0;
+	margin-top: 50px;
+	margin-bottom: -90px;
+}
+
+ul.pagination li {display: inline;}
+
+ul.pagination li a {
+	color: black;
+	float: left;
+	padding: 8px 16px;
+	text-decoration: none;
+	transition: background-color .3s;
+}
+
+ul.pagination li a.active {
+	background-color: #4CAF50;
+	color: white;
+	border-radius: 5px;
+}
+
+ul.pagination li a:hover:not(.active) {background-color: #ddd;}
+
+.btn-circle {
+	border-radius: 50%;
+	padding: 0.1em;
+	width:1.8em;
+}
+
+/* linha horizontal */
+
+.strike {
+	margin-top: 15px;
+	margin-left: -14px;
+	width: 107%;
+	display: block;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.strike > span {
+	position: relative;
+	display: inline-block;
+}
+
+.strike > span:before,
+.strike > span:after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	width: 9999px;
+	height: 1px;
+	background: black;
+}
+
+.strike > span:before {
+	right: 100%;
+	margin-right: 15px;
+}
+
+.strike > span:after {
+	left: 100%;
+	margin-left: 15px;
+}
